@@ -1,9 +1,9 @@
 from flask import Flask
-import jsonify
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
-from db import Base, db_instance
-from users_orm import UsersOrm, users_get_one, users_get_all
+from db import db_instance
+from users_orm import UsersOrm, users_get_all
+from reddit_data import insert_test_reddit
 
 app = Flask(__name__)
 
@@ -40,7 +40,10 @@ def db_user_test():
     return user[0].username
 
 
-
+@app.route('/reddit', methods=['GET'])
+def reddit_data():
+    insert_test_reddit()
+    return 'Finished!'
 
 
 if __name__ == '__main__':

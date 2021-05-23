@@ -20,6 +20,9 @@ def users_get_all():
     return db_instance.current_session.query(UsersOrm).all()
 
 
+def add_user(user):
+    db_instance.current_session.add(user)
+    db_instance.current_session.commit()
 
 
 

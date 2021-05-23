@@ -17,3 +17,8 @@ class GroupsOrm(Base):
 
 def groups_get_all():
     return db_instance.current_session.query(GroupsOrm).all()
+
+
+def add_group(group):
+    db_instance.current_session.add(group)
+    db_instance.current_session.commit()
