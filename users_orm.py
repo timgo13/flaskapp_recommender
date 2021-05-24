@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BIGINT, String, TIMESTAMP
+from sqlalchemy import Column, BIGINT, String, TIMESTAMP, FLOAT, ARRAY
 from db import Base, db_instance
 
 
@@ -10,6 +10,7 @@ class UsersOrm(Base):
     updated_at = Column(TIMESTAMP)
     username = Column(String)
     password = Column(String)
+    embedding = Column(ARRAY(FLOAT))
 
     def __init__(self, username, password):
         self.username = username

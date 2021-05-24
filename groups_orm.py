@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BIGINT, String, TIMESTAMP, text
+from sqlalchemy import Column, BIGINT, String, TIMESTAMP, FLOAT, ARRAY
 from db import Base, db_instance
 
 
@@ -9,6 +9,7 @@ class GroupsOrm(Base):
     updated_at = Column(TIMESTAMP)
     name = Column(String)
     creator_id = Column(BIGINT)
+    embedding = Column(ARRAY(FLOAT))
 
     def __init__(self, name, creator_id):
         self.name = name

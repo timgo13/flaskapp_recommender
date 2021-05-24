@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BIGINT, String, TIMESTAMP
+from sqlalchemy import Column, BIGINT, String, TIMESTAMP, ARRAY, FLOAT
 from db import Base, db_instance
 
 
@@ -12,6 +12,7 @@ class PostsOrm(Base):
     child_post_id = Column(BIGINT)
     user_feed_id = Column(BIGINT)
     group_feed_id = Column(BIGINT)
+    embedding = Column(ARRAY(FLOAT))
 
     def __init__(self, content, creator_id, group_id):
         self.content = content

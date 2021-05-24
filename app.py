@@ -2,8 +2,9 @@ from flask import Flask
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 from db import db_instance
-from users_orm import UsersOrm, users_get_all
+from users_orm import users_get_all
 from reddit_data import insert_test_reddit
+from embedding import SBert
 
 app = Flask(__name__)
 
@@ -44,6 +45,13 @@ def db_user_test():
 def reddit_data():
     insert_test_reddit()
     return 'Finished!'
+
+
+@app.route('/sbert', methods=['GET'])
+def test_sbert():
+    sbert = SBert()
+
+    return str(sbert.gpu)
 
 
 if __name__ == '__main__':
