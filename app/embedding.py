@@ -4,7 +4,7 @@ from sentence_transformers import SentenceTransformer, models, util
 from app.posts_orm import Posts, posts_get_all, add_post, posts_get_first
 from app.groups_orm import Groups, groups_get_all
 from app.users_orm import Users, users_get_all
-from app.user_subscribes_to_group_orm import UserSubscribes_toGroup, user_subscribtions_get_all
+from app.user_subscribes_to_group_orm import UserSubscribes_toGroup, user_subscriptions_get_all
 from app import db
 from sqlalchemy.exc import ProgrammingError
 
@@ -58,7 +58,7 @@ class SBert:
     def calc_all_user_embeddings(self):
         self.users = users_get_all()
         self.groups = groups_get_all()
-        self.user_subscribtions = user_subscribtions_get_all()
+        self.user_subscribtions = user_subscriptions_get_all()
 
         for u in self.users:
             user_group_subs = UserSubscribes_toGroup.query.filter_by(subscriber_id=u.id).all()

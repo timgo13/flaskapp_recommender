@@ -15,10 +15,10 @@ class UserSubscribes_toGroup(db.Model):
         self.group_id = group_id
 
 
-def user_subscribtions_get_all():
+def user_subscriptions_get_all():
     return UserSubscribes_toGroup.query.all()
 
 
-def add_user_subscribtions(user_subscribtions):
-    db.session.add(user_subscribtions)
+def add_user_subscriptions(user_subscriptions):
+    db.session.add(user_subscriptions)
     db.session.commit()

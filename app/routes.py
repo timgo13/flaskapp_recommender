@@ -1,12 +1,15 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
 from app.embedding import add_embedding_column
-from app.users_orm import users_get_all
-from app.reddit_data import insert_test_reddit
+from app.users_orm import Users, users_get_all
+from app.reddit_data import insert_test_reddit, insert_test_user
 from app.embedding import SBert
+from app.recommendations import get_user_group_recommendations
+from app.user_subscribes_to_group_orm import UserSubscribes_toGroup
 
 from app import app
+from app import db
 
 
 @app.route('/')
@@ -44,9 +47,28 @@ def reddit_data():
 @app.route('/sbert', methods=['GET'])
 def test_sbert():
     sbert = SBert()
-    #sbert.calc_all_post_embeddings()
-    #sbert.calc_all_group_embeddings()
+    # sbert.calc_all_post_embeddings()
+    # sbert.calc_all_group_embeddings()
     sbert.calc_all_user_embeddings()
 
     return jsonify(sbert.groups[0].embedding)
 
+
+@app.route('/user_recommendations/<user_id>', methods=['GET'])
+def get_user_recommendations(user_id):
+    user = Users.query.filter_by(id=user_id).first()
+    count_subscriptions = UserSubscribes_toGroup.query.filter_by(subscriber_id=user_id).count()
+    recommendations = get_user_group_recommendations(user_id, 5)
+
+    result = {'user_id': user_id, 'user_name': user.username, 'count_subscriptions': count_subscriptions,
+              'group_recommendations': recommendations}
+
+    return jsonify(result)
+
+@app.route('/test_user', methods=['GET'])
+def test_user():
+    insert_test_user()
+    user_names = ['test_user1', 'test_user2']
+    result = db.session.query(Users.id).filter(Users.username.in_(user_names)).all()
+    test_user_ids = [r[0] for r in result]
+    return jsonify(user_names, test_user_ids)
