@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -14,9 +14,15 @@ class DB:
         self.current_session = self.Session()
 
 
-def add_embedding_column(table, col_name):
+def add_column(table, col_name):
     q = 'ALTER TABLE ' + str(table) + ' ADD column ' + str(col_name) + ' float[];'
     db_instance.engine.execute(q)
+
+
+def add_embedding_column():
+    add_column('users', 'embedding')
+    add_column('groups', 'embedding')
+    add_column('posts', 'embedding')
 
 
 Base = declarative_base()

@@ -1,30 +1,17 @@
-from flask import Flask
+from flask import Flask, jsonify
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
-from db import db_instance
-from users_orm import users_get_all
-from reddit_data import insert_test_reddit
-from embedding import SBert
+from app.embedding import add_embedding_column
+from app.users_orm import users_get_all
+from app.reddit_data import insert_test_reddit
+from app.embedding import SBert
 
-app = Flask(__name__)
+from app import app
 
 
 @app.route('/')
 def hello_world():
     return 'Hello World!'
-
-
-@app.route('/dbtest', methods=['GET'])
-def db_test():
-    output = 'database connection is ok'
-
-    try:
-        db_instance.connect()
-        db_instance.current_session.execute('SELECT 1')
-    except Exception as e:
-        output = str(e)
-
-    return output
 
 
 @app.route('/usertest', methods=['GET'])
@@ -41,8 +28,15 @@ def db_user_test():
     return user[0].username
 
 
+@app.route('/column_test', methods=['GET'])
+def col_test():
+    add_embedding_column()
+    return 'Finished!'
+
+
 @app.route('/reddit', methods=['GET'])
 def reddit_data():
+    add_embedding_column()
     insert_test_reddit()
     return 'Finished!'
 
@@ -50,9 +44,9 @@ def reddit_data():
 @app.route('/sbert', methods=['GET'])
 def test_sbert():
     sbert = SBert()
+    #sbert.calc_all_post_embeddings()
+    #sbert.calc_all_group_embeddings()
+    sbert.calc_all_user_embeddings()
 
-    return str(sbert.gpu)
+    return jsonify(sbert.groups[0].embedding)
 
-
-if __name__ == '__main__':
-    app.run()
