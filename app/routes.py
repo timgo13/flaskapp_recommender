@@ -5,11 +5,13 @@ from app.embedding import add_embedding_column
 from app.users_orm import Users, users_get_all
 from app.reddit_data import insert_test_reddit, insert_test_user
 from app.embedding import SBert
-from app.recommendations import get_user_group_recommendations
+from app.recommendations import get_user_group_recommendations, get_post_group_recommendations
 from app.user_subscribes_to_group_orm import UserSubscribes_toGroup
 
 from app import app
 from app import db
+
+sbert = SBert()
 
 
 @app.route('/')
@@ -65,6 +67,7 @@ def get_user_recommendations(user_id):
 
     return jsonify(result)
 
+
 @app.route('/test_user', methods=['GET'])
 def test_user():
     insert_test_user()
@@ -72,3 +75,14 @@ def test_user():
     result = db.session.query(Users.id).filter(Users.username.in_(user_names)).all()
     test_user_ids = [r[0] for r in result]
     return jsonify(user_names, test_user_ids)
+
+
+@app.route('/post_recommendations', methods=['POST'])
+def get_post_recommednations():
+
+    content = request.json
+    post = content['post']
+    recommendations = get_post_group_recommendations(post, 3, sbert)
+
+    return jsonify(recommendations)
+

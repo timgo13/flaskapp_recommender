@@ -23,3 +23,16 @@ def get_user_group_recommendations(user_id, topn):
     recommendations = recommendations[::-1]
 
     return recommendations[:topn]
+
+
+def get_post_group_recommendations(post, topn, sbert):
+    post_embedding = sbert.encode(post)
+    groups = groups_get_all()
+    group_embeddings = [g.embedding for g in groups]
+
+    similarities = cosine_similarity([post_embedding], np.array(group_embeddings))
+    recommendations = [(groups[i].id, groups[i].name, similarities[0][i]) for i in range(len(group_embeddings))]
+
+    recommendations.sort(key=lambda x: x[2])
+    recommendations = recommendations[::-1]
+    return recommendations[:topn]

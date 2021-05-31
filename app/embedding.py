@@ -26,6 +26,9 @@ class SBert:
         else:
             self.model = SentenceTransformer(model_name)
 
+    def encode(self, text):
+        return self.model.encode(text, convert_to_numpy=True, normalize_embeddings=True)
+
     def calc_all_post_embeddings(self):
         self.posts = posts_get_all()
         posts_content = [self.posts[i].content for i in range(len(self.posts))]
