@@ -56,16 +56,19 @@ def test_sbert():
     return jsonify(sbert.groups[0].embedding)
 
 
-@app.route('/user_recommendations/<user_id>', methods=['GET'])
-def get_user_recommendations(user_id):
+@app.route('/api/recommendations/user_group_recommendations/<user_id>', methods=['GET'])
+def user_group_recommendations(user_id):
     user = Users.query.filter_by(id=user_id).first()
     count_subscriptions = UserSubscribes_toGroup.query.filter_by(subscriber_id=user_id).count()
     recommendations = get_user_group_recommendations(user_id, 5)
+    recommendations_ids = [r[0] for r in recommendations]
+    recommendations_names = [r[1] for r in recommendations]
 
     result = {'user_id': user_id, 'user_name': user.username, 'count_subscriptions': count_subscriptions,
-              'group_recommendations': recommendations}
+              'group_id_recommendations': recommendations_ids,'group_recommendations': recommendations_names}
 
-    return jsonify(result)
+    response = jsonify(result)
+    return response
 
 
 @app.route('/test_user', methods=['GET'])
@@ -77,12 +80,20 @@ def test_user():
     return jsonify(user_names, test_user_ids)
 
 
-@app.route('/post_recommendations', methods=['POST'])
-def get_post_recommednations():
+@app.route('/api/recommendations/post_recommendations', methods=['POST'])
+def get_post_recommendations():
 
     content = request.json
     post = content['post']
     recommendations = get_post_group_recommendations(post, 3, sbert)
 
     return jsonify(recommendations)
+
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    return response
 
