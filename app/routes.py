@@ -80,14 +80,17 @@ def test_user():
     return jsonify(user_names, test_user_ids)
 
 
-@app.route('/api/recommendations/post_recommendations', methods=['POST'])
+@app.route('/api/recommendations/post_group_recommendations', methods=['POST'])
 def get_post_recommendations():
 
     content = request.json
     post = content['post']
-    recommendations = get_post_group_recommendations(post, 3, sbert)
+    group = content['group']
+    recommendations = get_post_group_recommendations(sbert, post, group, 5)
+    recommendation_names = [r[1] for r in recommendations]
+    recommendation_ids = [r[0] for r in recommendations]
 
-    return jsonify(recommendations)
+    return jsonify(recommendation_ids, recommendation_names)
 
 
 @app.after_request
