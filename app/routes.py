@@ -14,32 +14,26 @@ from app import db
 sbert = SBert()
 
 
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
-
-
 @app.route('/usertest', methods=['GET'])
 def db_user_test():
-    output = False
-
+    error_output = False
     try:
         user = users_get_all()
     except MultipleResultsFound as e:
-        output = str(e)
+        error_output = str(e)
     except NoResultFound as e:
-        output = str(e)
+        error_output = str(e)
 
-    return user[0].username
+    return jsonify({"first_user_name": user[0].username, "error": error_output})
 
 
-@app.route('/column_test', methods=['GET'])
+@app.route('/add_embedding_column', methods=['GET'])
 def col_test():
-    add_embedding_column()
-    return 'Finished!'
+    result = add_embedding_column()
+    return jsonify(result)
 
 
-@app.route('/reddit', methods=['GET'])
+@app.route('/insert_test_reddit', methods=['GET'])
 def reddit_data():
     add_embedding_column()
     insert_test_reddit()

@@ -17,7 +17,8 @@ def get_user_group_recommendations(user_id, topn):
 
     result = db.session.query(UserSubscribes_toGroup.group_id).filter_by(subscriber_id=user_id).all()
     user_subscriptions_ids = [r[0] for r in result]
-    recommendations = [recommendations[i] for i in range(len(recommendations)) if recommendations[i][0] not in user_subscriptions_ids]
+    recommendations = [recommendations[i] for i in range(len(recommendations)) if recommendations[i][0]
+                       not in user_subscriptions_ids]
 
     recommendations.sort(key=lambda x: x[2])
     recommendations = recommendations[::-1]
@@ -43,3 +44,5 @@ def get_post_group_recommendations(sbert, post, group='None', topn=5):
     recommendations.sort(key=lambda x: x[2])
     recommendations = recommendations[::-1]
     return recommendations[:topn]
+
+

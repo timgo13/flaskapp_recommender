@@ -17,7 +17,7 @@ class SBert:
     posts = None
     groups = None
     users = None
-    user_subscribtions = None
+    user_subscriptions = None
 
     def __init__(self):
         if torch.cuda.is_available():
@@ -61,7 +61,7 @@ class SBert:
     def calc_all_user_embeddings(self):
         self.users = users_get_all()
         self.groups = groups_get_all()
-        self.user_subscribtions = user_subscriptions_get_all()
+        self.user_subscriptions = user_subscriptions_get_all()
 
         for u in self.users:
             user_group_subs = UserSubscribes_toGroup.query.filter_by(subscriber_id=u.id).all()
@@ -79,11 +79,14 @@ def add_column(table, col_name):
     try:
         q = 'ALTER TABLE ' + str(table) + ' ADD column ' + str(col_name) + ' float[];'
         db.engine.execute(q)
+        return 'Finished Successfully!'
     except ProgrammingError:
         db.session.rollback()
+        return 'Add Column failed! (possible already existed)'
 
 
 def add_embedding_column():
-    add_column('users', 'embedding')
-    add_column('groups', 'embedding')
-    add_column('posts', 'embedding')
+    r1 = add_column('users', 'embedding')
+    r2 = add_column('groups', 'embedding')
+    r3 = add_column('posts', 'embedding')
+    return {"users": r1, "groups": r2, "posts": r3}
