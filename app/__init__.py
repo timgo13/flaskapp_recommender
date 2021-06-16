@@ -1,12 +1,13 @@
 from flask import Flask
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
+from flask_apscheduler import APScheduler
 
 app = Flask(__name__)
 db = SQLAlchemy()
+scheduler = APScheduler()
 
-
-from app import routes, groups_orm, users_orm, posts_orm
+from app import routes, groups_orm, users_orm, posts_orm, embedding
 
 
 def create_app():

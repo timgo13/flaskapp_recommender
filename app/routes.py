@@ -35,17 +35,28 @@ def col_test():
 
 @app.route('/insert_test_reddit', methods=['GET'])
 def reddit_data():
-    add_embedding_column()
-    insert_test_reddit()
-    return 'Finished!'
+    try:
+        add_embedding_column()
+        insert_test_reddit()
+        return jsonify('Finished!')
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
+
+@app.route('/test_user', methods=['GET'])
+def test_user():
+    insert_test_user()
+    user_names = ['test_user1', 'test_user2']
+    result = db.session.query(Users.id).filter(Users.username.in_(user_names)).all()
+    test_user_ids = [r[0] for r in result]
+    return jsonify(user_names, test_user_ids)
 
 @app.route('/sbert', methods=['GET'])
 def test_sbert():
-    sbert = SBert()
     # sbert.calc_all_post_embeddings()
     # sbert.calc_all_group_embeddings()
-    sbert.calc_all_user_embeddings()
+    #sbert.calc_all_user_embeddings()
+    sbert.update_all_embeddings()
 
     return jsonify(sbert.groups[0].embedding)
 
@@ -63,15 +74,6 @@ def user_group_recommendations(user_id):
 
     response = jsonify(result)
     return response
-
-
-@app.route('/test_user', methods=['GET'])
-def test_user():
-    insert_test_user()
-    user_names = ['test_user1', 'test_user2']
-    result = db.session.query(Users.id).filter(Users.username.in_(user_names)).all()
-    test_user_ids = [r[0] for r in result]
-    return jsonify(user_names, test_user_ids)
 
 
 @app.route('/api/recommendations/post_group_recommendations', methods=['POST'])
