@@ -1,5 +1,4 @@
 import numpy as np
-import torch
 from sklearn.metrics.pairwise import cosine_similarity
 
 from app import db

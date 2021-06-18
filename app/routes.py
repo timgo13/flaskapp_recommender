@@ -9,13 +9,20 @@ from app.recommendations import get_user_group_recommendations, get_post_group_r
 from app.user_subscribes_to_group_orm import UserSubscribes_toGroup
 
 from app import app
-from app import db
+from app import db, scheduler
 
 sbert = SBert()
+
+# Deactivate Update Embeddings for Debugging
+# scheduler.add_job(id='Update Task', func=sbert.update_all_embeddings(), trigger='interval', hours=24)
 
 
 @app.route('/usertest', methods=['GET'])
 def db_user_test():
+    r"""
+    Test to check the database connection
+    :return: json
+    """
     error_output = False
     try:
         user = users_get_all()
@@ -29,12 +36,20 @@ def db_user_test():
 
 @app.route('/add_embedding_column', methods=['GET'])
 def col_test():
+    r"""
+    Adds embedding column to the tables
+    :return: json, finished or error
+    """
     result = add_embedding_column()
     return jsonify(result)
 
 
 @app.route('/insert_test_reddit', methods=['GET'])
 def reddit_data():
+    r"""
+    Inserts the reddit test data in the db
+    :return: json, finished or error
+    """
     try:
         add_embedding_column()
         insert_test_reddit()
@@ -45,24 +60,36 @@ def reddit_data():
 
 @app.route('/test_user', methods=['GET'])
 def test_user():
+    r"""
+    Inserts test users into db
+    :return: json, { user_names, user_ids }
+    """
     insert_test_user()
     user_names = ['test_user1', 'test_user2']
     result = db.session.query(Users.id).filter(Users.username.in_(user_names)).all()
     test_user_ids = [r[0] for r in result]
     return jsonify(user_names, test_user_ids)
 
-@app.route('/sbert', methods=['GET'])
-def test_sbert():
-    # sbert.calc_all_post_embeddings()
-    # sbert.calc_all_group_embeddings()
-    #sbert.calc_all_user_embeddings()
-    sbert.update_all_embeddings()
 
-    return jsonify(sbert.groups[0].embedding)
+@app.route('/sbert/<text>', methods=['GET'])
+def test_sbert(text):
+    r"""
+    For testing the sbert model, encodes given text to embedding
+    :param text: string, input text
+    :return: json, embedding vector/ array
+    """
+    embedding = sbert.encode(text)
+
+    return jsonify(embedding)
 
 
 @app.route('/api/recommendations/user_group_recommendations/<user_id>', methods=['GET'])
 def user_group_recommendations(user_id):
+    r"""
+    Returns group recommendations for a given user
+    :param user_id: int
+    :return: json, recommendations { userid, username, sub_count, list_group_ids, list_group_names }
+    """
     user = Users.query.filter_by(id=user_id).first()
     count_subscriptions = UserSubscribes_toGroup.query.filter_by(subscriber_id=user_id).count()
     recommendations = get_user_group_recommendations(user_id, 5)
@@ -78,7 +105,11 @@ def user_group_recommendations(user_id):
 
 @app.route('/api/recommendations/post_group_recommendations', methods=['POST'])
 def get_post_recommendations():
-
+    r"""
+    Return group recommendations for a given text/ post, (in connection with given main group)
+    :param json_post: { post, group }
+    :return: json, recommendations { list_group_ids, list_group_names }
+    """
     content = request.json
     post = content['post']
     group = content['group']
